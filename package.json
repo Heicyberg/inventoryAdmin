@@ -1,0 +1,26 @@
+{
+  "name": "inventoryAdmin",
+  "version": "1.0.0",
+  "description": "The app will take in orders from customers and deplete stock from the store's inventory,  track product sales across your store's departments and then provide a summary of the highest-grossing departments in the store",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Heicyberg/inventoryAdmin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Heicyberg/inventoryAdmin/issues"
+  },
+  "homepage": "https://github.com/Heicyberg/inventoryAdmin#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "dotenv": "^6.2.0",
+    "inquirer": "^6.2.1",
+    "mysql": "^2.16.0"
+  }
+}
