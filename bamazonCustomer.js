@@ -3,6 +3,7 @@ require("dotenv").config();
 var mysql = require("mysql");
 
 var input = { };
+var updatedInventory;
 
 //database set up
     var connection = mysql.createConnection({
@@ -43,19 +44,38 @@ var input = { };
                 message: "How many units you want to buy?"   
             }
             ]).then(function(user){
-                input.units = parseInt(user.number)
+                input.units = user.number;
+                input.index = user.Index;
                 var qury = "select * from products where ?";
                 connection.query(qury,{item_id:user.Index},function(err,data){
                   if (err) throw err;
                   if (user.number <= data[0].stock_qulity){
                     var orderCost = user.number * data[0].price
-                    var updatedInventory = data[0].stock_qulity - user.number;
-                    console.log("your order has been placed");
-                    console.log("Totally cost: $"+orderCost)
-                    connection.query('UPDATE products SET stock_qulity = ? WHERE item_id = ?', [updatedInventory,user.Index])
-                    start();
+                    updatedInventory = data[0].stock_qulity - user.number;
+                    console.log("You have oredered "+user.number+" "+data[0].product_name+"s")
+                    console.log("Totally cost will be: $"+orderCost)
+                    inquirer.prompt([
+                      {
+                        type: "confirm",
+                        name: "confirm",
+                        message: " Are you sure ?",
+                        default: true
+                      }
+                    ]).then(function(user){
+                      if(user.confirm){
+                        console.log("Your order has been placed!\n");
+                        console.log("Thank you for shopping with us!\n");
+                        connection.query('UPDATE products SET stock_qulity = ? WHERE item_id = ?', [updatedInventory,input.index])
+                        start();
+                      }else{
+                        console.log("Here's the table of products on sale!")
+                        start();
+                      }
+                    })
                   }else{
                     console.log("Insufficeint quantity!")
+                    console.log("Do you want some thing else ?")
+                    start();
                   }
                 }) 
             })
