@@ -37,7 +37,7 @@ var connection = mysql.createConnection({
              viewLowInventory();
              break;
              case 'Add to Inventory':
-             addInventory();
+             AddtoInventory();
              break;
              case 'Add New Product':
              addProduct();
@@ -59,7 +59,8 @@ function viewProducts(){
 function viewLowInventory(){
   connection.query("SELECT item_id, product_name, stock_qulity FROM products WHERE stock_qulity < 50", function(err, results) {
     if (err) throw err;
-    console.table(results)
+    console.table(results);
+
    })
 }
 // If a manager selects Add to Inventory,
@@ -77,23 +78,32 @@ function AddtoInventory(){
       item.inventory = data[i].stock_qulity;
       items.push(item)
     }
+
+    inquirer.prompt([
+      {
+        type: "list",
+        choices: selection,
+        name: "selection",
+        message: " Which item do you want to add inventory?"
+      },
+      {
+        type: "input",
+        name: "unit",
+        message: " How many unit you to add inventory?"
+      }
+    ]).then(function(user){
+      var updatedUnits ;
+      for(i=0;i<items.length;i++){
+        if(items[i].product_name == user.selection){
+          updatedUnits = items[i].inventory+parseInt(user.unit);
+        }
+      }
+      connection.query('UPDATE products SET stock_qulity = ? WHERE  product_name = ?', [updatedUnits,user.selection])
+      console.log("inventory updated")
+    });
    });
 
-   inquirer.prompt([
-    {
-      type: "list",
-      choices: selection,
-      name: "selection",
-      message: " Which item do you want to add inventory?"
-    },
-    {
-      type: "input",
-      name: "unit",
-      message: " How many unit you to add inventory?"
-    }
-  ]).then(function(user){
-    connection.query('UPDATE products SET stock_qulity = ? WHERE  product_name = ?', [parseInt(user.unit) ,user.selection])
-  });
+   
    
 }
 // If a manager selects Add New Product, 
