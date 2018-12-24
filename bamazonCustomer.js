@@ -2,6 +2,8 @@ var inquirer = require("inquirer");
 require("dotenv").config();
 var mysql = require("mysql");
 
+//global variables:
+
 var input = { };
 var updatedInventory;
 
