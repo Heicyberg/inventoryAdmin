@@ -52,6 +52,7 @@ function viewProducts(){
     connection.query("SELECT * FROM products", function(err, results) {
         if (err) throw err;
         layout(results);
+        start();
     })
 }
 // If a manager selects View Low Inventory, 
@@ -60,7 +61,7 @@ function viewLowInventory(){
   connection.query("SELECT item_id, product_name, stock_qulity FROM products WHERE stock_qulity < 50", function(err, results) {
     if (err) throw err;
     console.table(results);
-
+    start();
    })
 }
 // If a manager selects Add to Inventory,
@@ -72,12 +73,14 @@ function AddtoInventory(){
     var items = [];
     var n = data.length;
     for(i=0;i<n;i++){
-      item.item_id = data[i].item_id;
-      item.product_name = data[i].product_name;
+      items[i]= {};
+      items[i].item_id = data[i].item_id;
+      items[i].product_name = data[i].product_name;
       selection.push(data[i].product_name)
-      item.inventory = data[i].stock_qulity;
-      items.push(item)
+      items[i].inventory = data[i].stock_qulity;
     }
+
+    console.log(items)
 
     inquirer.prompt([
       {
@@ -92,23 +95,51 @@ function AddtoInventory(){
         message: " How many unit you to add inventory?"
       }
     ]).then(function(user){
-      var updatedUnits ;
+      var updatedUnits = 0;
+     
       for(i=0;i<items.length;i++){
         if(items[i].product_name == user.selection){
-          updatedUnits = items[i].inventory+parseInt(user.unit);
+
+          updatedUnits = parseInt(items[i].inventory)+parseInt(user.unit);
         }
       }
       connection.query('UPDATE products SET stock_qulity = ? WHERE  product_name = ?', [updatedUnits,user.selection])
       console.log("inventory updated")
+      start();
     });
    });
-
-   
-   
 }
 // If a manager selects Add New Product, 
 //it should allow the manager to add a completely new product to the store.
-
+function addProduct(){
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "product",
+      message: " What product do you want to add?"
+    },
+    {
+      type: "input",
+      name: "unit",
+      message: " How many unit you to add inventory?"
+    },
+    {
+      type: "input",
+      name: "price",
+      message: " What's the sale's price?"
+    },
+    {
+      type:"list",
+      choices: ["Appliance","Books","Cooking","Electronics","Foods","Furniture"],
+      name:"department",
+      message:"Which department the item belongs to ?"
+    }
+  ]).then(function(user){
+    connection.query("INSERT INTO products (product_name,department_name,price,stock_qulity) VALUES (?,?,?,?)", [user.product,user.department, parseFloat(user.price) ,parseInt(user.unit)]) 
+    console.log("Item has been added")
+    start();
+  })
+}
 
 //print the table of IDs, names, prices, and quantities.
 function layout(object){

@@ -6,6 +6,7 @@ var mysql = require("mysql");
 
 var input = { };
 var updatedInventory;
+var orderCost;
 
 //database set up
     var connection = mysql.createConnection({
@@ -52,7 +53,7 @@ var updatedInventory;
                 connection.query(qury,{item_id:user.Index},function(err,data){
                   if (err) throw err;
                   if (user.number <= data[0].stock_qulity){
-                    var orderCost = user.number * data[0].price
+                    orderCost = user.number * data[0].price
                     updatedInventory = data[0].stock_qulity - user.number;
                     console.log("You have oredered "+user.number+" "+data[0].product_name+"s")
                     console.log("Totally cost will be: $"+orderCost)
@@ -67,7 +68,11 @@ var updatedInventory;
                       if(user.confirm){
                         console.log("Your order has been placed!\n");
                         console.log("Thank you for shopping with us!\n");
-                        connection.query('UPDATE products SET stock_qulity = ? WHERE item_id = ?', [updatedInventory,input.index])
+
+                        connection.query('UPDATE products SET stock_qulity = ? WHERE item_id = ?', [updatedInventory,input.index]);
+                        //updates product_sales for the department
+                        //connection.query('UPDATE departments INNER JOIN products ON products.department_name=departments.department_name SET product_sales  = product_sales + ? WHERE item_id= ?', [orderCost,input.index])
+                        connection.query('UPDATE products SET product_sales  = product_sales + ? WHERE item_id= ?', [orderCost,input.index])
                         start();
                       }else{
                         console.log("Here's the table of products on sale!")
@@ -82,7 +87,6 @@ var updatedInventory;
                 }) 
             })
       }
- 
 
       function layout(object){
          var n = object.length;
