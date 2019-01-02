@@ -1,4 +1,5 @@
 var inquirer = require("inquirer");
+
 require("dotenv").config();
 var mysql = require("mysql");
 var selection = [];
